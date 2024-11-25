@@ -1,0 +1,97 @@
+# Redis Configuration
+redis:
+  host: localhost
+  port: 6379
+  db: 0
+  password: null
+
+# MongoDB Configuration
+mongodb:
+  uri: mongodb://localhost:27017/
+  database: scraping_data
+  collections:
+    ecommerce: products
+    finance: financial_data
+
+# PostgreSQL Configuration
+postgresql:
+  host: localhost
+  port: 5432
+  database: scraping_data
+  user: scraper
+  password: scraper_password
+
+# Scraping Settings
+scraping:
+  concurrent_requests: 16
+  download_delay: 1
+  retry_times: 3
+  retry_delay: 10
+  timeout: 30
+  user_agent_rotation: true
+  proxy_rotation: true
+  respect_robots_txt: true
+
+# Rate Limiting
+rate_limits:
+  default:
+    requests_per_second: 2
+    burst_size: 5
+  domains:
+    example.com:
+      requests_per_second: 1
+      burst_size: 3
+
+# Proxy Settings
+proxies:
+  enabled: true
+  proxy_list_url: null
+  rotation_interval: 300
+  check_interval: 600
+  types:
+    - http
+    - https
+
+# Monitoring
+monitoring:
+  prometheus:
+    host: localhost
+    port: 9090
+  grafana:
+    host: localhost
+    port: 3000
+  alerts:
+    email:
+      enabled: false
+      smtp_server: smtp.gmail.com
+      smtp_port: 587
+      username: null
+      password: null
+      from_address: null
+      to_addresses: []
+
+# Logging
+logging:
+  level: INFO
+  format: '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
+  file: logs/scraper.log
+  max_size: 10MB
+  backup_count: 5
+
+# Storage
+storage:
+  type: mongodb  # or postgresql
+  backup:
+    enabled: true
+    interval: 86400  # 24 hours
+    retention_days: 7
+    path: data/backups
+
+# Export Settings
+export:
+  formats:
+    - json
+    - csv
+  compression: gzip
+  batch_size: 1000
+  path: data/exports
