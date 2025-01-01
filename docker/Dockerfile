@@ -1,31 +1,32 @@
+# Use official Python image
 FROM python:3.8-slim
 
 # Set environment variables
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # Set working directory
 WORKDIR /app
 
 # Install system dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y \
     build-essential \
-    libpq-dev \
+    libssl-dev \
+    libffi-dev \
+    libxml2-dev \
+    libxslt1-dev \
+    zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install Python dependencies
+# Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy project files
 COPY . .
 
-# Create non-root user
-RUN useradd -m scraper && \
-    chown -R scraper:scraper /app
-USER scraper
+# Expose ports
+EXPOSE 8000 9090 3000
 
-# Command to run the scraper
-CMD ["python", "src/main.py"]
+# Set entrypoint
+ENTRYPOINT ["python", "src/main.py"]

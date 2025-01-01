@@ -1,42 +1,7 @@
-# Distributed Web Scraping System
+# Project File Structure and Components
 
-A scalable, distributed web scraping solution built with Scrapy and Redis for gathering large-scale datasets from e-commerce and financial websites.
+## Directory Structure
 
-## Features
-
-### Core Functionality
-- Distributed task queue using Redis
-  - Task prioritization
-  - Duplicate URL detection
-  - Real-time task monitoring
-  - Failure recovery
-  - Load balancing
-  
-- Robust Data Extraction
-  - Structured data parsing
-  - Dynamic content handling
-  - Custom field extractors
-  - Data validation
-  - Error correction
-
-- Middleware Components
-  - Smart rate limiting
-  - Proxy rotation
-  - User agent management
-  - Request/Response filtering
-  - Custom downloader
-
-- Storage Solutions
-  - MongoDB integration
-  - PostgreSQL support
-  - Data partitioning
-  - Backup strategies
-  - Schema management
-
-- Comprehensive monitoring and scheduling capabilities
-- Docker-based deployment for easy scaling
-
-## Project Structure
 ```
 distributed-web-scraping/
 ├── src/
@@ -122,144 +87,54 @@ distributed-web-scraping/
 └── README.md
 ```
 
-## Prerequisites
+## Key Files and Their Roles
 
-- Python 3.8+
-- Docker and Docker Compose
-- Redis
-- MongoDB or PostgreSQL
-- Scrapy
-- Redis-py
+### Core Functionality
+- **src/main.py**: Application entry point
+- **src/spiders/**: Contains all spider implementations
+- **src/middleware/**: Request processing components
+- **src/tasks/**: Task queue management
 
-## Installation
+### Data Management
+- **src/storage/**: Database integration and schema management
+- **src/validation/**: Data validation pipelines
+- **src/exporters/**: Data export and API access
 
-1. Clone the repository:
-```bash
-git clone https://github.com/username/distributed-scraping.git
-cd distributed-scraping
-```
+### Infrastructure
+- **docker/**: Containerization configuration
+- **infrastructure/**: Cloud deployment configurations
+- **config/**: System and logging configurations
 
-2. Build Docker containers:
-```bash
-docker-compose build
-```
+### Monitoring
+- **src/monitoring/**: Application-level monitoring
+- **infrastructure/monitoring/**: Infrastructure monitoring
 
-3. Start services:
-```bash
-docker-compose up -d
-```
+### Testing
+- **tests/**: Unit and integration tests
 
-## Configuration
+## Component Interactions
 
-### Spider Configuration
-```python
-# settings.py
-REDIS_HOST = 'localhost'
-REDIS_PORT = 6379
-SCHEDULER = "scrapy_redis.scheduler.Scheduler"
-DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
-```
+1. **Task Queue System**
+   - Redis interacts with task_queue_manager.py
+   - URL deduplication and scheduling handled by dedicated modules
 
-### Database Settings
-```python
-# Choose between MongoDB and PostgreSQL
-MONGODB_URI = "mongodb://localhost:27017/"
-DATABASE_NAME = "scraping_data"
+2. **Spider Execution**
+   - Spiders use middleware components for request processing
+   - Extracted data passed to validation system
 
-# Or for PostgreSQL
-POSTGRES_DB = "scraping_data"
-POSTGRES_USER = "user"
-POSTGRES_PASSWORD = "password"
-```
+3. **Data Pipeline**
+   - Validated data stored in selected database
+   - Monitoring system tracks data quality and storage performance
 
-## Usage
+4. **Export System**
+   - Data can be exported via CSV or API
+   - Exporters interact with storage system
 
-1. Add URLs to Redis queue:
-```python
-from redis import Redis
-redis_client = Redis(host='localhost', port=6379)
-redis_client.lpush('spider:start_urls', 'https://example.com')
-```
+5. **Monitoring**
+   - Collects metrics from all components
+   - Provides alerts and dashboards
 
-2. Run spiders:
-```bash
-docker-compose exec scraper scrapy crawl spider_name
-```
-
-3. Monitor progress:
-```bash
-docker-compose logs -f
-```
-
-## Spider Examples
-
-### E-commerce Spider
-```python
-from scrapy_redis.spiders import RedisSpider
-
-class EcommerceSpider(RedisSpider):
-    name = 'ecommerce'
-    
-    def parse(self, response):
-        yield {
-            'product_name': response.css('.product-name::text').get(),
-            'price': response.css('.price::text').get(),
-            'stock': response.css('.stock::text').get()
-        }
-```
-
-### Finance Spider
-```python
-class FinanceSpider(RedisSpider):
-    name = 'finance'
-    
-    def parse(self, response):
-        yield {
-            'ticker': response.css('.symbol::text').get(),
-            'price': response.css('.current-price::text').get(),
-            'volume': response.css('.volume::text').get()
-        }
-```
-
-## Error Handling
-
-The system implements multiple layers of error handling:
-
-1. Network failures: Automatic retry with exponential backoff
-2. Rate limiting: Intelligent delay between requests
-3. Data validation: Schema validation before storage
-4. Monitoring: Alert system for critical failures
-
-## Scaling
-
-Scale horizontally by adding more worker containers:
-```bash
-docker-compose up -d --scale scraper=3
-```
-
-## Monitoring
-
-Access monitoring dashboards:
-- Redis monitoring: `http://localhost:8001`
-- Database metrics: `http://localhost:8002`
-- Spider logs: `http://localhost:8003`
-- Grafana dashboards: `http://localhost:3000`
-- Prometheus metrics: `http://localhost:9090`
-
-## Security
-
-- Data encryption at rest and in transit
-- Access control for scraped data
-- Compliance with robots.txt
-- Rate limiting and polite crawling
-- Regular security audits
-
-## License
-
-MIT License - See LICENSE file for details
-
-## Contact
-
-Project maintainers:
-- Email: spdeynolove@gmail.com
-- GitHub: [@spdeynolove](https://github.com/spdeynolove)
+6. **Infrastructure**
+   - Docker containers managed by docker-compose
+   - Kubernetes orchestrates container deployment
+   - Terraform manages cloud resources

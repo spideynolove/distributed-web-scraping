@@ -1,97 +1,61 @@
-# Redis Configuration
+# System-wide configuration
+system:
+  name: "Distributed Web Scraping System"
+  version: "1.0.0"
+  environment: "production"
+
+# Redis configuration
 redis:
-  host: localhost
+  host: "localhost"
   port: 6379
   db: 0
-  password: null
+  timeout: 5
+  max_connections: 100
 
-# MongoDB Configuration
-mongodb:
-  uri: mongodb://localhost:27017/
-  database: scraping_data
-  collections:
-    ecommerce: products
-    finance: financial_data
+# Database configuration
+databases:
+  mongo:
+    uri: "mongodb://localhost:27017/"
+    database: "scraping_data"
+    timeout: 5000
+  postgres:
+    host: "localhost"
+    port: 5432
+    database: "scraping_data"
+    user: "scraper"
+    password: "securepassword"
+    pool_size: 10
 
-# PostgreSQL Configuration
-postgresql:
-  host: localhost
-  port: 5432
-  database: scraping_data
-  user: scraper
-  password: scraper_password
-
-# Scraping Settings
-scraping:
-  concurrent_requests: 16
-  download_delay: 1
+# Scrapy settings
+scrapy:
+  concurrent_requests: 100
+  download_delay: 0.25
+  retry_enabled: true
   retry_times: 3
-  retry_delay: 10
-  timeout: 30
-  user_agent_rotation: true
-  proxy_rotation: true
-  respect_robots_txt: true
+  retry_http_codes: [500, 502, 503, 504, 408]
+  httpcache_enabled: false
 
-# Rate Limiting
-rate_limits:
-  default:
-    requests_per_second: 2
-    burst_size: 5
-  domains:
-    example.com:
-      requests_per_second: 1
-      burst_size: 3
-
-# Proxy Settings
-proxies:
-  enabled: true
-  proxy_list_url: null
-  rotation_interval: 300
-  check_interval: 600
-  types:
-    - http
-    - https
-
-# Monitoring
+# Monitoring settings
 monitoring:
   prometheus:
-    host: localhost
+    enabled: true
     port: 9090
   grafana:
-    host: localhost
-    port: 3000
-  alerts:
-    email:
-      enabled: false
-      smtp_server: smtp.gmail.com
-      smtp_port: 587
-      username: null
-      password: null
-      from_address: null
-      to_addresses: []
-
-# Logging
-logging:
-  level: INFO
-  format: '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
-  file: logs/scraper.log
-  max_size: 10MB
-  backup_count: 5
-
-# Storage
-storage:
-  type: mongodb  # or postgresql
-  backup:
     enabled: true
-    interval: 86400  # 24 hours
-    retention_days: 7
-    path: data/backups
+    port: 3000
+  alert_thresholds:
+    error_rate: 0.1
+    response_time: 5.0
+    throughput: 10
 
-# Export Settings
-export:
-  formats:
-    - json
-    - csv
-  compression: gzip
-  batch_size: 1000
-  path: data/exports
+# Security settings
+security:
+  encryption:
+    enabled: true
+    algorithm: "AES-256-CBC"
+  access_control:
+    enabled: true
+    roles:
+      - admin
+      - scraper
+      - viewer
